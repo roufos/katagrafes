@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1976d2">
+<link rel="manifest" href="manifest.json">
+<title>Καταχωρήσεις</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f6f8;
+ color:#202124
+}
+header{
+ background:#1976d2;
+ color:white;
+ padding:18px 16px;
+ font-size:22px;
+ font-weight:bold
+}
+main{
+ padding:16px;
+ max-width:650px;
+ margin:auto
+}
+.card{
+ background:white;
+ border-radius:14px;
+ padding:16px;
+ margin-bottom:16px;
+ box-shadow:0 2px 8px #00000012
+}
+label{
+ display:block;
+ font-weight:bold;
+ margin:12px 0 6px
+}
+input,select,button{
+ width:100%;
+ font-size:17px;
+ padding:12px;
+ border-radius:10px;
+ border:1px solid #ccd2d8
+}
+button{
+ background:#1976d2;
+ color:white;
+ border:0;
+ font-weight:bold;
+ margin-top:16px
+}
+.row{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ padding:12px 0;
+ border-bottom:1px solid #eee
+}
+.row:last-child{border-bottom:0}
+.price{font-weight:bold}
+.delete{
+ width:auto;
+ margin:5px 0 0;
+ padding:7px 10px;
+ background:#e53935;
+ font-size:14px
+}
+.empty{
+ color:#666;
+ text-align:center;
+ padding:20px
+}
+.total{
+ font-size:19px;
+ font-weight:bold;
+ text-align:right;
+ margin-top:12px
+}
+</style>
+</head>
+
+<body>
+
+<header>Καταχωρήσεις</header>
+
+<main>
+
+<section class="card">
+
+<h2>Νέα καταχώρηση</h2>
+
+<label>Ημερομηνία</label>
+<input id="date" type="date">
+
+<label>Κατηγορία</label>
+<select id="category">
+<option>Καφέ</option>
+<option>Σάντουιτς</option>
+<option>Αναψυκτικό</option>
+</select>
+
+<label>Τιμή (€)</label>
+<input id="price"
+       type="number"
+       min="0"
+       step="0.01"
+       inputmode="decimal"
+       placeholder="π.χ. 2,50">
+
+<button onclick="addEntry()">Αποθήκευση</button>
+
+</section>
+
+<section class="card">
+
+<h2>Καταχωρήσεις</h2>
+
+<div id="list"></div>
+
+<div id="total" class="total"></div>
+
+</section>
+
+</main>
+
+<script>
+
+const KEY="katagrafes_v1";
+
+const dateEl=document.getElementById("date");
+
+dateEl.value=new Date().toISOString().slice(0,10);
+
+function load(){
+ return JSON.parse(localStorage.getItem(KEY)||"[]");
+}
+
+function save(entries){
+ localStorage.setItem(KEY,JSON.stringify(entries));
+ render();
+}
+
+function addEntry(){
+
+ const price=parseFloat(
+   document.getElementById("price").value.replace(",",".")
+ );
+
+ if(!Number.isFinite(price)||price<0){
+   alert("Βάλε έγκυρη τιμή.");
+   return;
+ }
+
+ const entries=load();
+
+ entries.unshift({
+   id:Date.now(),
+   date:dateEl.value,
+   category:document.getElementById("category").value,
+   price:Math.round(price*100)/100
+ });
+
+ save(entries);
+
+ document.getElementById("price").value="";
+}
+
+function removeEntry(id){
+ save(load().filter(x=>x.id!==id));
+}
+
+function fmtDate(s){
+ const [y,m,d]=s.split("-");
+ return `${d}/${m}/${y}`;
+}
+
+function render(){
+
+ const entries=load();
+ const list=document.getElementById("list");
+
+ if(!entries.length){
+
+   list.innerHTML=
+   '<div class="empty">Δεν υπάρχουν καταχωρήσεις.</div>';
+
+   document.getElementById("total").textContent="";
+
+   return;
+ }
+
+ list.innerHTML=entries.map(x=>`
+
+ <div class="row">
+
+   <div>
+     <b>${fmtDate(x.date)}</b><br>
+     ${x.category}
+   </div>
+
+   <div style="text-align:right">
+
+     <span class="price">
+       ${x.price.toFixed(2).replace(".",",")} €
+     </span>
+
+     <br>
+
+     <button
+       class="delete"
+       onclick="removeEntry(${x.id})">
+       Διαγραφή
+     </button>
+
+   </div>
+
+ </div>
+
+ `).join("");
+
+ const total=entries.reduce(
+   (sum,x)=>sum+x.price,0
+ );
+
+ document.getElementById("total").textContent=
+   `Σύνολο: ${total.toFixed(2).replace(".",",")} €`;
+}
+
+render();
+
+</script>
+
+</body>
+</html>
