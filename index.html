@@ -136,110 +136,160 @@ button{
 
 </main>
 
-<script>
+<script type="module">
 
-const KEY="katagrafes_v1";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
-const dateEl=document.getElementById("date");
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-dateEl.value=new Date().toISOString().slice(0,10);
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBb4DPdxCDxhvKN2RrdFcguICttyJ1Kusw",
+  authDomain: "expenses-app-d3ecd.firebaseapp.com",
+  projectId: "expenses-app-d3ecd",
+  storageBucket: "expenses-app-d3ecd.firebasestorage.app",
+  messagingSenderId: "522397626820",
+  appId: "1:522397626820:web:51c4cdc0900a907b507491"
+};
 
-function load(){
- return JSON.parse(localStorage.getItem(KEY)||"[]");
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Πεδίο ημερομηνίας
+const dateEl = document.getElementById("date");
+
+// Βάζει αυτόματα τη σημερινή ημερομηνία
+dateEl.value = new Date().toISOString().slice(0, 10);
+
+// Εδώ κρατάμε προσωρινά τις καταχωρήσεις που έρχονται από Firebase
+let entries = [];
+
+// Φόρτωση καταχωρήσεων από Firebase
+async function load() {
+
+  const snapshot = await getDocs(collection(db, "expenses"));
+
+  entries = snapshot.docs.map(document => ({
+    firebaseId: document.id,
+    ...document.data()
+  }));
+
+  // Ταξινόμηση: οι νεότερες πρώτες
+  entries.sort((a, b) => {
+    const aTime = a.createdAt || 0;
+    const bTime = b.createdAt || 0;
+    return bTime - aTime;
+  });
+
+  render();
 }
 
-function save(entries){
- localStorage.setItem(KEY,JSON.stringify(entries));
- render();
+// Προσθήκη νέας καταχώρησης
+window.addEntry = async function addEntry() {
+
+  const price = parseFloat(
+    document.getElementById("price").value.replace(",", ".")
+  );
+
+  if (!Number.isFinite(price) || price < 0) {
+    alert("Βάλε έγκυρη τιμή.");
+    return;
+  }
+
+  const newEntry = {
+    date: dateEl.value,
+    category: document.getElementById("category").value,
+    price: Math.round(price * 100) / 100,
+    createdAt: Date.now()
+  };
+
+  await addDoc(collection(db, "expenses"), newEntry);
+
+  document.getElementById("price").value = "";
+
+  await load();
+};
+
+// Διαγραφή καταχώρησης
+window.removeEntry = async function removeEntry(firebaseId) {
+
+  await deleteDoc(doc(db, "expenses", firebaseId));
+
+  await load();
+};
+
+// Μορφοποίηση ημερομηνίας από 2026-08-15 σε 15/08/2026
+function fmtDate(s) {
+
+  if (!s) return "";
+
+  const [y, m, d] = s.split("-");
+
+  return `${d}/${m}/${y}`;
 }
 
-function addEntry(){
+// Εμφάνιση καταχωρήσεων στην οθόνη
+function render() {
 
- const price=parseFloat(
-   document.getElementById("price").value.replace(",",".")
- );
+  const list = document.getElementById("list");
 
- if(!Number.isFinite(price)||price<0){
-   alert("Βάλε έγκυρη τιμή.");
-   return;
- }
+  if (!entries.length) {
 
- const entries=load();
+    list.innerHTML =
+      '<div class="empty">Δεν υπάρχουν καταχωρήσεις.</div>';
 
- entries.unshift({
-   id:Date.now(),
-   date:dateEl.value,
-   category:document.getElementById("category").value,
-   price:Math.round(price*100)/100
- });
+    document.getElementById("total").textContent = "";
 
- save(entries);
+    return;
+  }
 
- document.getElementById("price").value="";
+  list.innerHTML = entries.map(x => `
+
+    <div class="row">
+
+      <div>
+        <b>${fmtDate(x.date)}</b><br>
+        ${x.category}
+      </div>
+
+      <div style="text-align:right">
+
+        <span class="price">
+          ${Number(x.price).toFixed(2).replace(".", ",")} €
+        </span>
+
+        <br>
+
+        <button
+          class="delete"
+          onclick="removeEntry('${x.firebaseId}')">
+          Διαγραφή
+        </button>
+
+      </div>
+
+    </div>
+
+  `).join("");
+
+  const total = entries.reduce(
+    (sum, x) => sum + Number(x.price || 0), 0
+  );
+
+  document.getElementById("total").textContent =
+    `Σύνολο: ${total.toFixed(2).replace(".", ",")} €`;
 }
 
-function removeEntry(id){
- save(load().filter(x=>x.id!==id));
-}
-
-function fmtDate(s){
- const [y,m,d]=s.split("-");
- return `${d}/${m}/${y}`;
-}
-
-function render(){
-
- const entries=load();
- const list=document.getElementById("list");
-
- if(!entries.length){
-
-   list.innerHTML=
-   '<div class="empty">Δεν υπάρχουν καταχωρήσεις.</div>';
-
-   document.getElementById("total").textContent="";
-
-   return;
- }
-
- list.innerHTML=entries.map(x=>`
-
- <div class="row">
-
-   <div>
-     <b>${fmtDate(x.date)}</b><br>
-     ${x.category}
-   </div>
-
-   <div style="text-align:right">
-
-     <span class="price">
-       ${x.price.toFixed(2).replace(".",",")} €
-     </span>
-
-     <br>
-
-     <button
-       class="delete"
-       onclick="removeEntry(${x.id})">
-       Διαγραφή
-     </button>
-
-   </div>
-
- </div>
-
- `).join("");
-
- const total=entries.reduce(
-   (sum,x)=>sum+x.price,0
- );
-
- document.getElementById("total").textContent=
-   `Σύνολο: ${total.toFixed(2).replace(".",",")} €`;
-}
-
-render();
+// Αρχική φόρτωση καταχωρήσεων
+load();
 
 </script>
 
