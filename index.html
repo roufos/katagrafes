@@ -298,6 +298,27 @@ function render() {
 
  window.exportCSV = function exportCSV() {
 
+    if (!entries.length) {
+    alert("Δεν υπάρχουν καταχωρήσεις.");
+    return;
+  }
+
+  const rows = [
+    ["Ημερομηνία", "Κατηγορία", "Ποσό"]
+  ];
+
+  entries.forEach(entry => {
+    rows.push([
+      entry.date,
+      entry.category,
+      entry.price
+    ]);
+  });
+
+    const csvContent = rows
+    .map(row => row.join(";"))
+    .join("\n");
+
 };
 
 // Αρχική φόρτωση καταχωρήσεων
