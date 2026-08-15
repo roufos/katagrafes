@@ -298,12 +298,12 @@ function render() {
 
  window.exportCSV = function exportCSV() {
 
-    if (!entries.length) {
+  if (!entries.length) {
     alert("Δεν υπάρχουν καταχωρήσεις.");
     return;
   }
 
-    const rows = [
+  const rows = [
     ["Ημερομηνία", "Κατηγορία", "Ποσό"]
   ];
 
@@ -322,18 +322,24 @@ function render() {
     ]);
   });
 
-  const csvContent = rows
-    .map(row => row.map(value => `"${value}"`).join(";"))
-    .join("\r\n");
+  const csvContent =
+    "sep=;\r\n" +
+    rows
+      .map(row =>
+        row
+          .map(value => `"${String(value).replace(/"/g, '""')}"`)
+          .join(";")
+      )
+      .join("\r\n");
 
-   const blob = new Blob(
+  const blob = new Blob(
     ["\ufeff" + csvContent],
     { type: "text/csv;charset=utf-8;" }
   );
 
   const url = URL.createObjectURL(blob);
 
-    const link = document.createElement("a");
+  const link = document.createElement("a");
 
   link.href = url;
   link.download = "expenses.csv";
@@ -345,7 +351,6 @@ function render() {
   document.body.removeChild(link);
 
   URL.revokeObjectURL(url);
-
 };
 
 // Αρχική φόρτωση καταχωρήσεων
