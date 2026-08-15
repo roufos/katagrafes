@@ -167,7 +167,11 @@ const db = getFirestore(app);
 const dateEl = document.getElementById("date");
 
 // Βάζει αυτόματα τη σημερινή ημερομηνία
-dateEl.value = new Date().toISOString().slice(0, 10);
+const now = new Date();
+dateEl.value = new Date(
+  now.getTime() - now.getTimezoneOffset() * 60000
+).toISOString().slice(0, 10);
+ 
 
 // Εδώ κρατάμε προσωρινά τις καταχωρήσεις που έρχονται από Firebase
 let entries = [];
