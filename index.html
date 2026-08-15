@@ -322,19 +322,29 @@ function render() {
     ]);
   });
 
-  const csvContent =
-    "sep=;\r\n" +
-    rows
-      .map(row =>
-        row
-          .map(value => `"${String(value).replace(/"/g, '""')}"`)
-          .join(";")
-      )
-      .join("\r\n");
+  const tsvContent = rows
+    .map(row =>
+      row
+        .map(value => String(value).replace(/\t/g, " ").replace(/\r?\n/g, " "))
+        .join("\t")
+    )
+    .join("\r\n");
+
+  const buffer = new ArrayBuffer(tsvContent.length * 2 + 2);
+  const view = new Uint8Array(buffer);
+
+  view[0] = 0xFF;
+  view[1] = 0xFE;
+
+  for (let i = 0; i < tsvContent.length; i++) {
+    const charCode = tsvContent.charCodeAt(i);
+    view[i * 2 + 2] = charCode & 0xFF;
+    view[i * 2 + 3] = charCode >> 8;
+  }
 
   const blob = new Blob(
-    ["\ufeff" + csvContent],
-    { type: "text/csv;charset=utf-8;" }
+    [buffer],
+    { type: "text/tab-separated-values;charset=utf-16le;" }
   );
 
   const url = URL.createObjectURL(blob);
@@ -342,7 +352,7 @@ function render() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "expenses.csv";
+  link.download = "expenses.tsv";
 
   document.body.appendChild(link);
 
@@ -351,7 +361,9 @@ function render() {
   document.body.removeChild(link);
 
   URL.revokeObjectURL(url);
+  
 };
+
 
 // Αρχική φόρτωση καταχωρήσεων
 load();
