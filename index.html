@@ -303,21 +303,28 @@ function render() {
     return;
   }
 
-  const rows = [
+    const rows = [
     ["Ημερομηνία", "Κατηγορία", "Ποσό"]
   ];
 
   entries.forEach(entry => {
+
+    const formattedDate = fmtDate(entry.date);
+
+    const formattedPrice = Number(entry.price || 0)
+      .toFixed(2)
+      .replace(".", ",");
+
     rows.push([
-      entry.date,
+      formattedDate,
       entry.category,
-      entry.price
+      formattedPrice
     ]);
   });
 
-    const csvContent = rows
-    .map(row => row.join(";"))
-    .join("\n");
+  const csvContent = rows
+    .map(row => row.map(value => `"${value}"`).join(";"))
+    .join("\r\n");
 
    const blob = new Blob(
     ["\ufeff" + csvContent],
