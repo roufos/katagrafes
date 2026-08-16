@@ -282,11 +282,15 @@ function parsePriceValue(value) {
 
   let cleaned = String(value).trim();
 
-  // Δεν θέλουμε διαχωριστικά χιλιάδων μέσα στο web app.
   // Αν ο χρήστης βάλει κόμμα, το κάνουμε τελεία για να αποθηκευτεί ως αριθμός.
   cleaned = cleaned.replace(",", ".");
 
-  return parseFloat(cleaned);
+  // Επιτρέπουμε μόνο αριθμούς με προαιρετικά δεκαδικά
+  if (!/^\d+(\.\d+)?$/.test(cleaned)) {
+    return NaN;
+  }
+
+  return Number(cleaned);
 }
 
 // Εμφανίζει ποσό με ελληνικό κόμμα, χωρίς διαχωριστικό χιλιάδων
@@ -433,7 +437,6 @@ function render() {
   URL.revokeObjectURL(url);
   
 };
-
 
 // Αρχική φόρτωση καταχωρήσεων
 load();
