@@ -598,6 +598,43 @@ window.exportCSV = function exportCSV() {
   URL.revokeObjectURL(url);
 };
 
+ // ΕΔΩ ΘΑ ΜΠΕΙ Η ΝΕΑ exportExcel()
+ window.exportExcel = function exportExcel() {
+
+  if (!entries.length) {
+    alert("Δεν υπάρχουν καταχωρήσεις.");
+    return;
+  }
+
+  const data = entries.map(entry => {
+
+    const dateText = entry.date || "";
+
+    return {
+      "Ημερομηνία": dateText,
+      "Αρ. Κατηγορίας": entry.categoryId || "",
+      "Κατηγορία": entry.category || "",
+      "Υποκατηγορία": entry.subcategory || "",
+      "Ποσό": Number(entry.price || 0)
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Expenses"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    "expenses.xlsx"
+  );
+};
+
  // Αλλάζει τις υποκατηγορίες όταν αλλάζει η βασική κατηγορία
 categoryEl.addEventListener("change", updateSubcategoryOptions);
 
