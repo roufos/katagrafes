@@ -150,6 +150,7 @@ import {
   addDoc,
   getDocs,
   deleteDoc,
+  updateDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -180,6 +181,9 @@ dateEl.value = new Date(
 // Εδώ κρατάμε προσωρινά τις καταχωρήσεις που έρχονται από Firebase
 let entries = [];
 
+ // Αν έχει τιμή, σημαίνει ότι επεξεργαζόμαστε υπάρχουσα εγγραφή
+let editingId = null;
+
 // Φόρτωση καταχωρήσεων από Firebase
 async function load() {
 
@@ -200,7 +204,7 @@ async function load() {
   render();
 }
 
-// Προσθήκη νέας καταχώρησης
+// Προσθήκη ή ενημέρωση καταχώρησης
 window.addEntry = async function addEntry() {
 
   const price = parseFloat(
@@ -212,12 +216,33 @@ window.addEntry = async function addEntry() {
     return;
   }
 
-  const newEntry = {
+  const entryData = {
     date: dateEl.value,
     category: document.getElementById("category").value,
-    price: Math.round(price * 100) / 100,
-    createdAt: Date.now()
+    price: Math.round(price * 100) / 100
   };
+
+  if (editingId) {
+
+    await updateDoc(doc(db, "expenses", editingId), entryData);
+
+    editingId = null;
+
+    document.querySelector("button[onclick='addEntry()']").textContent =
+      "Αποθήκευση";
+
+  } else {
+
+    await addDoc(collection(db, "expenses"), {
+      ...entryData,
+      createdAt: Date.now()
+    });
+  }
+
+  document.getElementById("price").value = "";
+
+  await load();
+};
 
   await addDoc(collection(db, "expenses"), newEntry);
 
