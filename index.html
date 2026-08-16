@@ -330,10 +330,12 @@ window.addEntry = async function addEntry() {
   }
 
   const entryData = {
-    date: dateEl.value,
-    category: document.getElementById("category").value,
-    price: Math.round(price * 100) / 100
-  };
+  date: dateEl.value,
+  categoryId: getCategoryId(categoryEl.value),
+  category: categoryEl.value,
+  subcategory: subcategoryEl.value,
+  price: Math.round(price * 100) / 100
+};
 
   if (editingId) {
 
@@ -379,9 +381,14 @@ window.editEntry = function editEntry(firebaseId) {
 
   editingId = firebaseId;
 
-  dateEl.value = entry.date;
-  document.getElementById("category").value = entry.category;
-  document.getElementById("price").value = fmtPrice(entry.price);
+dateEl.value = entry.date;
+categoryEl.value = entry.category;
+
+updateSubcategoryOptions();
+
+subcategoryEl.value = entry.subcategory || "Άλλο";
+
+document.getElementById("price").value = fmtPrice(entry.price);
 
   document.querySelector("button[onclick='addEntry()']").textContent =
     "Ενημέρωση";
@@ -448,9 +455,10 @@ function render() {
     <div class="row">
 
       <div>
-        <b>${fmtDate(x.date)}</b><br>
-        ${x.category}
-      </div>
+  <b>${fmtDate(x.date)}</b><br>
+  ${x.category}<br>
+  <small>${x.subcategory || "-"}</small>
+</div>
 
       <div style="text-align:right">
 
