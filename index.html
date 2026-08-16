@@ -114,9 +114,7 @@ button{
 
 <label>Τιμή (€)</label>
 <input id="price"
-       type="number"
-       min="0"
-       step="0.01"
+       type="text"
        inputmode="decimal"
        placeholder="π.χ. 2,50">
 
@@ -207,9 +205,9 @@ async function load() {
 // Προσθήκη ή ενημέρωση καταχώρησης
 window.addEntry = async function addEntry() {
 
-  const price = parseFloat(
-    document.getElementById("price").value.replace(",", ".")
-  );
+  const price = parsePriceValue(
+  document.getElementById("price").value
+);
 
   if (!Number.isFinite(price) || price < 0) {
     alert("Βάλε έγκυρη τιμή.");
@@ -279,6 +277,28 @@ window.editEntry = function editEntry(firebaseId) {
   });
 };
 
+// Διαβάζει ποσό είτε με κόμμα είτε με τελεία
+function parsePriceValue(value) {
+
+  if (!value) return NaN;
+
+  let cleaned = String(value).trim();
+
+  // Δεν θέλουμε διαχωριστικά χιλιάδων μέσα στο web app.
+  // Αν ο χρήστης βάλει κόμμα, το κάνουμε τελεία για να αποθηκευτεί ως αριθμός.
+  cleaned = cleaned.replace(",", ".");
+
+  return parseFloat(cleaned);
+}
+
+// Εμφανίζει ποσό με ελληνικό κόμμα, χωρίς διαχωριστικό χιλιάδων
+function fmtPrice(value) {
+
+  return Number(value || 0)
+    .toFixed(2)
+    .replace(".", ",");
+}
+ 
 // Μορφοποίηση ημερομηνίας από 2026-08-15 σε 15/08/2026
 function fmtDate(s) {
 
