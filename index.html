@@ -264,9 +264,7 @@ window.editEntry = function editEntry(firebaseId) {
 
   dateEl.value = entry.date;
   document.getElementById("category").value = entry.category;
-  document.getElementById("price").value = Number(entry.price)
-    .toFixed(2)
-    .replace(".", ",");
+  document.getElementById("price").value = fmtPrice(entry.price);
 
   document.querySelector("button[onclick='addEntry()']").textContent =
     "Ενημέρωση";
@@ -336,7 +334,7 @@ function render() {
       <div style="text-align:right">
 
         <span class="price">
-          ${Number(x.price).toFixed(2).replace(".", ",")} €
+          ${fmtPrice(x.price)} €
         </span>
 
         <br>
@@ -365,7 +363,7 @@ function render() {
   );
 
   document.getElementById("total").textContent =
-    `Σύνολο: ${total.toFixed(2).replace(".", ",")} €`;
+  `Σύνολο: ${fmtPrice(total)} €`;
 }
 
  window.exportCSV = function exportCSV() {
