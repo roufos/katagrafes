@@ -244,13 +244,6 @@ window.addEntry = async function addEntry() {
   await load();
 };
 
-  await addDoc(collection(db, "expenses"), newEntry);
-
-  document.getElementById("price").value = "";
-
-  await load();
-};
-
 // Διαγραφή καταχώρησης
 window.removeEntry = async function removeEntry(firebaseId) {
 
