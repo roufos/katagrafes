@@ -259,6 +259,33 @@ window.removeEntry = async function removeEntry(firebaseId) {
   await load();
 };
 
+// Φόρτωση εγγραφής στη φόρμα για επεξεργασία
+window.editEntry = function editEntry(firebaseId) {
+
+  const entry = entries.find(x => x.firebaseId === firebaseId);
+
+  if (!entry) {
+    alert("Δεν βρέθηκε η εγγραφή.");
+    return;
+  }
+
+  editingId = firebaseId;
+
+  dateEl.value = entry.date;
+  document.getElementById("category").value = entry.category;
+  document.getElementById("price").value = Number(entry.price)
+    .toFixed(2)
+    .replace(".", ",");
+
+  document.querySelector("button[onclick='addEntry()']").textContent =
+    "Ενημέρωση";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+};
+
 // Μορφοποίηση ημερομηνίας από 2026-08-15 σε 15/08/2026
 function fmtDate(s) {
 
