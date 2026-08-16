@@ -245,6 +245,8 @@ window.addEntry = async function addEntry() {
 // Διαγραφή καταχώρησης
 window.removeEntry = async function removeEntry(firebaseId) {
 
+  if (!confirm("Να διαγραφεί η εγγραφή;")) return;
+
   await deleteDoc(doc(db, "expenses", firebaseId));
 
   await load();
