@@ -596,67 +596,6 @@ window.exportCSV = function exportCSV() {
   URL.revokeObjectURL(url);
 };
 
-  const rows = [
-    ["Ημερομηνία", "Κατηγορία", "Ποσό"]
-  ];
-
-  entries.forEach(entry => {
-
-    const formattedDate = fmtDate(entry.date);
-
-    const formattedPrice = Number(entry.price || 0)
-      .toFixed(2)
-      .replace(".", ",");
-
-    rows.push([
-      formattedDate,
-      entry.category,
-      formattedPrice
-    ]);
-  });
-
-  const tsvContent = rows
-    .map(row =>
-      row
-        .map(value => String(value).replace(/\t/g, " ").replace(/\r?\n/g, " "))
-        .join("\t")
-    )
-    .join("\r\n");
-
-  const buffer = new ArrayBuffer(tsvContent.length * 2 + 2);
-  const view = new Uint8Array(buffer);
-
-  view[0] = 0xFF;
-  view[1] = 0xFE;
-
-  for (let i = 0; i < tsvContent.length; i++) {
-    const charCode = tsvContent.charCodeAt(i);
-    view[i * 2 + 2] = charCode & 0xFF;
-    view[i * 2 + 3] = charCode >> 8;
-  }
-
-  const blob = new Blob(
-    [buffer],
-    { type: "text/tab-separated-values;charset=utf-16le;" }
-  );
-
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = "expenses.tsv";
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
-  
-};
-
  // Αλλάζει τις υποκατηγορίες όταν αλλάζει η βασική κατηγορία
 categoryEl.addEventListener("change", updateSubcategoryOptions);
 
