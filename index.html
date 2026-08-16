@@ -321,6 +321,13 @@ function render() {
 
         <br>
 
+                <button
+          class="delete"
+          style="background:#f9a825"
+          onclick="editEntry('${x.firebaseId}')">
+          Επεξεργασία
+        </button>
+
         <button
           class="delete"
           onclick="removeEntry('${x.firebaseId}')">
