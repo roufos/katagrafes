@@ -112,6 +112,11 @@ button{
 <option>12 — Διάφορα αγαθά και υπηρεσίες</option>
 </select>
 
+ <label>Υποκατηγορία</label>
+<select id="subcategory">
+<option>Άλλο</option>
+</select>
+
 <label>Τιμή (€)</label>
 <input id="price"
        type="text"
@@ -168,6 +173,8 @@ const db = getFirestore(app);
 
 // Πεδίο ημερομηνίας
 const dateEl = document.getElementById("date");
+const categoryEl = document.getElementById("category");
+const subcategoryEl = document.getElementById("subcategory");
 
 // Βάζει αυτόματα τη σημερινή ημερομηνία
 const now = new Date();
@@ -181,6 +188,114 @@ let entries = [];
 
  // Αν έχει τιμή, σημαίνει ότι επεξεργαζόμαστε υπάρχουσα εγγραφή
 let editingId = null;
+ // Υποκατηγορίες ανά βασική κατηγορία
+const subcategoriesByCategory = {
+  "1": [
+    "Σούπερ μάρκετ",
+    "Φούρνος",
+    "Mini market",
+    "Κρεοπωλείο/Μανάβικο",
+    "Νερά/αναψυκτικά",
+    "Άλλο"
+  ],
+  "2": [
+    "Καπνός",
+    "Αλκοόλ",
+    "Άλλο"
+  ],
+  "3": [
+    "Ρούχα",
+    "Παπούτσια",
+    "Παιδικά",
+    "Άλλο"
+  ],
+  "4": [
+    "Ενοίκιο",
+    "Ρεύμα",
+    "Νερό",
+    "Κοινόχρηστα",
+    "Θέρμανση",
+    "Συντήρηση σπιτιού",
+    "Άλλο"
+  ],
+  "5": [
+    "Ηλεκτρικές συσκευές",
+    "Έπιπλα",
+    "Είδη σπιτιού",
+    "Καθαριστικά",
+    "Εργαλεία/επισκευές",
+    "Άλλο"
+  ],
+  "6": [
+    "Φάρμακα",
+    "Γιατρός",
+    "Εξετάσεις",
+    "Οδοντίατρος",
+    "Άλλο"
+  ],
+  "7": [
+    "Καύσιμα",
+    "Διόδια",
+    "Parking",
+    "Service",
+    "Ασφάλεια/τέλη",
+    "ΜΜΜ/Ταξί",
+    "Άλλο"
+  ],
+  "8": [
+    "Κινητό",
+    "Internet",
+    "Συνδρομές επικοινωνίας",
+    "Άλλο"
+  ],
+  "9": [
+    "Παιχνίδια",
+    "Σινεμά/θέατρο",
+    "Βιβλία",
+    "Δραστηριότητες παιδιών",
+    "Streaming/συνδρομές",
+    "Άλλο"
+  ],
+  "10": [
+    "Σχολείο",
+    "Φροντιστήριο",
+    "Βιβλία/γραφική ύλη",
+    "Δραστηριότητες εκπαίδευσης",
+    "Άλλο"
+  ],
+  "11": [
+    "Καφές",
+    "Φαγητό έξω",
+    "Delivery",
+    "Ξενοδοχείο/Διαμονή",
+    "Παγωτό/σνακ έξω",
+    "Άλλο"
+  ],
+  "12": [
+    "Κούρεμα/περιποίηση",
+    "Δώρα",
+    "Δημόσιες υπηρεσίες/έγγραφα",
+    "Τράπεζες/χρεώσεις",
+    "Άλλο"
+  ]
+};
+
+ // Παίρνει τον αριθμό κατηγορίας από το κείμενο, π.χ. "11 — ..." -> "11"
+function getCategoryId(categoryText) {
+  return String(categoryText).split("—")[0].trim();
+}
+
+// Γεμίζει το dropdown υποκατηγορίας ανάλογα με την κατηγορία
+function updateSubcategoryOptions() {
+
+  const categoryId = getCategoryId(categoryEl.value);
+
+  const subcategories = subcategoriesByCategory[categoryId] || ["Άλλο"];
+
+  subcategoryEl.innerHTML = subcategories
+    .map(name => `<option>${name}</option>`)
+    .join("");
+}
 
 // Φόρτωση καταχωρήσεων από Firebase
 async function load() {
@@ -439,6 +554,12 @@ function render() {
   URL.revokeObjectURL(url);
   
 };
+
+ // Αλλάζει τις υποκατηγορίες όταν αλλάζει η βασική κατηγορία
+categoryEl.addEventListener("change", updateSubcategoryOptions);
+
+// Αρχική φόρτωση υποκατηγοριών
+updateSubcategoryOptions();
 
 // Αρχική φόρτωση καταχωρήσεων
 load();
