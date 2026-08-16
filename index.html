@@ -424,6 +424,32 @@ function fmtPrice(value) {
     .toFixed(2)
     .replace(".", ",");
 }
+
+ // Επιστρέφει το όνομα μήνα στα ελληνικά από ημερομηνία τύπου 2026-08-16
+function getMonthName(dateText) {
+
+  if (!dateText) return "";
+
+  const monthNumber = Number(dateText.slice(5, 7));
+
+  const months = [
+    "",
+    "Ιανουάριος",
+    "Φεβρουάριος",
+    "Μάρτιος",
+    "Απρίλιος",
+    "Μάιος",
+    "Ιούνιος",
+    "Ιούλιος",
+    "Αύγουστος",
+    "Σεπτέμβριος",
+    "Οκτώβριος",
+    "Νοέμβριος",
+    "Δεκέμβριος"
+  ];
+
+  return months[monthNumber] || "";
+}
  
 // Μορφοποίηση ημερομηνίας από 2026-08-15 σε 15/08/2026
 function fmtDate(s) {
@@ -495,12 +521,80 @@ function render() {
   `Σύνολο: ${fmtPrice(total)} €`;
 }
 
- window.exportCSV = function exportCSV() {
+window.exportCSV = function exportCSV() {
 
   if (!entries.length) {
     alert("Δεν υπάρχουν καταχωρήσεις.");
     return;
   }
+
+  const rows = [
+    [
+      "Ημερομηνία",
+      "Έτος",
+      "Μήνας",
+      "Αρ. Κατηγορίας",
+      "Κατηγορία",
+      "Υποκατηγορία",
+      "Ποσό"
+    ]
+  ];
+
+  entries.forEach(entry => {
+
+    const dateText = entry.date || "";
+    const year = dateText.slice(0, 4);
+    const monthName = getMonthName(dateText);
+
+    const categoryText = entry.category || "";
+    const categoryId = entry.categoryId || getCategoryId(categoryText);
+
+    const subcategory = entry.subcategory || "-";
+
+    const formattedPrice = fmtPrice(entry.price);
+
+    rows.push([
+      fmtDate(dateText),
+      year,
+      monthName,
+      categoryId,
+      categoryText,
+      subcategory,
+      formattedPrice
+    ]);
+  });
+
+  const csvContent = rows
+    .map(row =>
+      row
+        .map(value => `"${String(value).replace(/"/g, '""')}"`)
+        .join(";")
+    )
+    .join("\r\n");
+
+  // UTF-8 BOM για να διαβάζονται σωστά τα ελληνικά στο Excel
+  const bom = "\uFEFF";
+
+  const blob = new Blob(
+    [bom + csvContent],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "expenses.csv";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+};
 
   const rows = [
     ["Ημερομηνία", "Κατηγορία", "Ποσό"]
