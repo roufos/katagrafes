@@ -100,23 +100,23 @@ button{
 
 <label>Κατηγορία</label>
 <select id="category">
-<option>1 — Διατροφή και μη αλκοολούχα ποτά</option>
-<option>2 — Αλκοολούχα ποτά και καπνός</option>
-<option>3 — Ένδυση και υπόδηση</option>
-<option>4 — Στέγαση</option>
-<option>5 — Διαρκή αγαθά, είδη νοικοκυριού και υπηρεσίες</option>
-<option>6 — Υγεία</option>
-<option>7 — Μεταφορές</option>
-<option>8 — Επικοινωνίες</option>
-<option>9 — Αναψυχή και πολιτισμός</option>
-<option>10 — Εκπαίδευση</option>
-<option>11 — Ξενοδοχεία, καφέ, εστιατόρια</option>
-<option>12 — Διάφορα αγαθά και υπηρεσίες</option>
+  <option>1 — Διατροφή</option>
+  <option>2 — Καπνός / Αλκοόλ</option>
+  <option>3 — Ένδυση</option>
+  <option>4 — Στέγαση</option>
+  <option>5 — Νοικοκυριό</option>
+  <option>6 — Υγεία</option>
+  <option>7 — Μεταφορές</option>
+  <option>8 — Παιδιά</option>
+  <option>9 — Αναψυχή</option>
+  <option>10 — Διακοπές</option>
+  <option>11 — Εστίαση</option>
+  <option>12 — Διάφορα</option>
 </select>
 
  <label>Υποκατηγορία</label>
 <select id="subcategory">
-<option>Άλλο</option>
+  <option>Λοιπά</option>
 </select>
 
 <label>Τιμή (€)</label>
@@ -193,92 +193,92 @@ let editingId = null;
  // Υποκατηγορίες ανά βασική κατηγορία
 const subcategoriesByCategory = {
   "1": [
-    "Σούπερ μάρκετ",
+    "Mini Market",
+    "Market",
     "Φούρνος",
-    "Mini market",
-    "Κρεοπωλείο/Μανάβικο",
-    "Νερά/αναψυκτικά",
-    "Άλλο"
+    "Λαϊκή Αγορά",
+    "Λοιπά"
   ],
+
   "2": [
-    "Καπνός",
+    "Τσιγάρα",
     "Αλκοόλ",
-    "Άλλο"
+    "Λοιπά"
   ],
+
   "3": [
-    "Ρούχα",
-    "Παπούτσια",
-    "Παιδικά",
-    "Άλλο"
+    "Άνδρας",
+    "Γυναίκα",
+    "Παιδιά",
+    "Λοιπά"
   ],
+
   "4": [
     "Ενοίκιο",
     "Ρεύμα",
     "Νερό",
+    "Επικοινωνίες",
     "Κοινόχρηστα",
-    "Θέρμανση",
-    "Συντήρηση σπιτιού",
-    "Άλλο"
+    "Συντήρηση",
+    "Λοιπά"
   ],
+
   "5": [
-    "Ηλεκτρικές συσκευές",
-    "Έπιπλα",
-    "Είδη σπιτιού",
+    "Χαρτικά",
     "Καθαριστικά",
-    "Εργαλεία/επισκευές",
-    "Άλλο"
+    "Εξοπλισμός",
+    "Συντήρηση",
+    "Λοιπά"
   ],
+
   "6": [
     "Φάρμακα",
-    "Γιατρός",
+    "Ιατροί",
+    "Οδοντίατροι",
     "Εξετάσεις",
-    "Οδοντίατρος",
-    "Άλλο"
+    "Λοιπά"
   ],
+
   "7": [
     "Καύσιμα",
-    "Διόδια",
-    "Parking",
-    "Service",
-    "Ασφάλεια/τέλη",
-    "ΜΜΜ/Ταξί",
-    "Άλλο"
+    "Συντήρηση",
+    "Μετακινήσεις",
+    "Λοιπά"
   ],
+
   "8": [
-    "Κινητό",
-    "Internet",
-    "Συνδρομές επικοινωνίας",
-    "Άλλο"
-  ],
-  "9": [
-    "Παιχνίδια",
-    "Σινεμά/θέατρο",
-    "Βιβλία",
-    "Δραστηριότητες παιδιών",
-    "Streaming/συνδρομές",
-    "Άλλο"
-  ],
-  "10": [
+    "Ξένες Γλώσσες",
+    "Δραστηριότητες",
     "Σχολείο",
-    "Φροντιστήριο",
-    "Βιβλία/γραφική ύλη",
-    "Δραστηριότητες εκπαίδευσης",
-    "Άλλο"
+    "Λοιπά"
   ],
+
+  "9": [
+    "Ψυχαγωγία",
+    "Λοιπά"
+  ],
+
+  "10": [
+    "Διαμονή",
+    "Μετακίνηση",
+    "Φαγητό",
+    "Λοιπά"
+  ],
+
   "11": [
-    "Καφές",
-    "Φαγητό έξω",
-    "Delivery",
-    "Ξενοδοχείο/Διαμονή",
-    "Παγωτό/σνακ έξω",
-    "Άλλο"
+    "Ταβέρνα",
+    "Delivery Φαγητό",
+    "Fast Food",
+    "Καφετέρια",
+    "Γλυκά",
+    "Λοιπά"
   ],
+
   "12": [
-    "Κούρεμα/περιποίηση",
+    "Φόροι",
+    "Περιποίηση",
     "Δώρα",
-    "Δημόσιες υπηρεσίες/έγγραφα",
-    "Τράπεζες/χρεώσεις",
-    "Άλλο"
+    "Λοιπά"
   ]
 };
 
@@ -292,7 +292,7 @@ function updateSubcategoryOptions() {
 
   const categoryId = getCategoryId(categoryEl.value);
 
-  const subcategories = subcategoriesByCategory[categoryId] || ["Άλλο"];
+  const subcategories = subcategoriesByCategory[categoryId] || ["Λοιπά"];
 
   subcategoryEl.innerHTML = subcategories
     .map(name => `<option>${name}</option>`)
@@ -388,7 +388,7 @@ categoryEl.value = entry.category;
 
 updateSubcategoryOptions();
 
-subcategoryEl.value = entry.subcategory || "Άλλο";
+subcategoryEl.value = entry.subcategory || "Λοιπά";
 
 document.getElementById("price").value = fmtPrice(entry.price);
 
